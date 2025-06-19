@@ -1,0 +1,33 @@
+{
+  "name": "todo-backend",
+  "version": "1.0.0",
+  "description": "Backend server for my todo application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RDFearless/todo-backend.git"
+  },
+  "keywords": [
+    "todo",
+    "javascript",
+    "backend"
+  ],
+  "author": "Rudra Desai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RDFearless/todo-backend/issues"
+  },
+  "homepage": "https://github.com/RDFearless/todo-backend#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "mongoose": "^8.16.0",
+    "nodemon": "^3.1.10"
+  }
+}
