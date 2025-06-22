@@ -8,10 +8,13 @@ import {
     validatePassword
 } from "../utils/validations.js"
 import { User } from "../models/user.model.js";
+import jwt from "jsonwebtoken"
 
 
-const generateAccessAndRefreshToken = async (user) => {
+const generateAccessAndRefreshToken = async (userId) => {
     try {
+        const user = await User.findById(userId);
+        
         const refreshToken = user.generateRefreshToken();
         const accessToken = user.generateAccessToken();
         
@@ -92,7 +95,7 @@ const loginUser = asyncHandler( async (req, res) => {
     }
     
     // tokens
-    const {refreshToken, accessToken} = await generateAccessAndRefreshToken(user);
+    const {refreshToken, accessToken} = await generateAccessAndRefreshToken(user._id);
     
     const loggedUser = await User.findById(user._id).select("-password -refreshToken");
     
@@ -147,23 +150,149 @@ const logoutUser = asyncHandler( async (req, res) => {
 });
 
 const accessRefreshToken = asyncHandler( async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+    if(!incomingRefreshToken) {
+        throw new ApiError(401, "Unauthorized");
+    }
     
-})
+    const decodedToken = jwt.verify(
+        incomingRefreshToken, 
+        process.env.REFRESH_TOKEN_SECRET
+    );
+    
+    try {
+        const user = await User.findById(decodedToken?._id);
+        if(!user) {
+            throw new ApiError(401, "Invalid Refresh Token");
+        }
+        if(incomingRefreshToken !== user.refreshToken) {
+            throw new ApiError(403, "Refresh Token is expired or used");
+        }
+        
+        const {refreshToken, accessToken} = await generateAccessAndRefreshToken(user._id);
+            
+        const options = {
+            httpOnly: true,
+            secure: true
+        };
+        
+        return res
+        .status(200)
+        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "New token generated"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid Refresh Token");
+    }
+});
 
 const changeCurrentPassword = asyncHandler( async (req, res) => {
+    const {oldPassword, newPassword} = req.body; 
     
-})
+    validatePassword(oldPassword);
+    validatePassword(newPassword);
+    
+    if (oldPassword === newPassword) {
+        throw new ApiError(400, "New password must be different from old password");
+    }
+    
+    const user = await User.findById(req.user._id);
+    
+    const isPasswordCorrect = await user.isPasswordValid(oldPassword);
+    if(!isPasswordCorrect) { 
+        throw new ApiError(403, "Invalid old password");
+    }
+    
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false }); 
+    
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+    
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+        new ApiResponse(200, {}, "Password changed successfully")
+    );
+});
 
 const updateUserInfo = asyncHandler( async (req, res) => {
-      
+    const {fullname, username, email} = req.body;
+    if(!fullname && !username && !email) {
+        throw new ApiError(400, "All fields can't be empty");
+    }
+    
+    const updatedInfo = {};
+    if(fullname) {
+        validateFullname(fullname);
+        updatedInfo.fullname = fullname;
+    }
+    if(username) {
+        validateUsername(username);
+        updatedInfo.username = username;
+    }
+    if(email) {
+        validateFullname(email);
+        updatedInfo.email = email;
+    }
+    
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: updatedInfo
+        }, { new: true }
+    ).select("-password -refreshToken -collections");
+    
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            updatedUser, 
+            "User info updated"
+        )
+    );
 })
 
 const getCurrentUser = asyncHandler( async (req, res) => {
+    const user = await User.findById(req.user._id).select("-password -refreshToken");
     
-})
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user,
+            "Current user fetched"
+        )
+    );
+});
 
 const getUserCollections = asyncHandler( async (req, res) => {
+    const { collections } = await User.findById(req.user._id);
     
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                length: collections.length,
+                collections: collections
+            },
+            "User collections fetched"
+        )
+    );
 });
 
 
