@@ -16,5 +16,9 @@ app.use(express.static("public"));
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
+// Routers
+import userRouter from "./routes/user.route.js"
+
+app.use("/api/v1/users", userRouter);
 
 export { app }

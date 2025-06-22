@@ -18,7 +18,6 @@ const userSchema = new Schema(
             trim: true,
             lowercase: true,
             unique: true,
-            index: true,
             match: [
                 /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                 "Please enter a valid email address"
@@ -31,7 +30,6 @@ const userSchema = new Schema(
             trim: true,
             lowercase: true,
             unique: true,
-            index: true,
             minLength: [3, "Username must be at least 3 characters"],
             maxLength: [20, "Username can't be more than 20 characters"],
             match: [
@@ -67,10 +65,10 @@ userSchema.methods.isPasswordValid = async function(password) {
     return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken = async function() {
+userSchema.methods.generateAccessToken = function() {
     return jwt.sign(
         {
-            id: this._id,
+            _id: this._id,
             username: this.username,
             email: this.email,
             fullname: this.fullname
@@ -82,10 +80,10 @@ userSchema.methods.generateAccessToken = async function() {
     )
 }
 
-userSchema.methods.generateRefreshToken = async function() {
+userSchema.methods.generateRefreshToken = function() {
     return jwt.sign(
         {
-            id: this._id
+            _id: this._id
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
