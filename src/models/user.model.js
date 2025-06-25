@@ -45,12 +45,7 @@ const userSchema = new Schema(
         
         refreshToken: {
             type: String
-        },
-        
-        collections: [{
-            type: Schema.Types.ObjectId,
-            ref: "Collection"
-        }]
+        }
     }, { timestamps: true }
 )
 

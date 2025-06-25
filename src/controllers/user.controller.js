@@ -278,24 +278,6 @@ const getCurrentUser = asyncHandler( async (req, res) => {
     );
 });
 
-const getUserCollections = asyncHandler( async (req, res) => {
-    const { collections } = await User.findById(req.user._id);
-    
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            {
-                length: collections.length,
-                collections: collections
-            },
-            "User collections fetched"
-        )
-    );
-});
-
-
 
 
 export { 
@@ -305,6 +287,5 @@ export {
     accessRefreshToken,
     changeCurrentPassword,
     updateUserInfo,
-    getCurrentUser,
-    getUserCollections
+    getCurrentUser
 }

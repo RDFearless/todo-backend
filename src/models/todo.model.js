@@ -20,13 +20,10 @@ const todoSchema = new Schema (
             default: false
         },
         
-        category: {
-            type: String,
-            enum: {
-                values: ["work", "gym", "study", "hobby", "personal", "shopping", "health", "other"],
-                message: "Category must be one of: work, gym, study, hobby, personal, shopping, health, other"
-            },
-            required: [true, "Category is required"]
+        parentCollection: {
+            type: Schema.Types.ObjectId,
+            ref: "Collection",
+            required: true
         },
         
         completedAt: {

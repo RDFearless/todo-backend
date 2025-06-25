@@ -6,8 +6,7 @@ import {
     accessRefreshToken, 
     changeCurrentPassword, 
     updateUserInfo, 
-    getCurrentUser, 
-    getUserCollections 
+    getCurrentUser 
 } from "../controllers/user.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
@@ -25,6 +24,5 @@ router.route("/change-password").patch(changeCurrentPassword)
 router.route("/profile")
 .get(getCurrentUser)
 .patch(updateUserInfo)
-router.route("/collections").get(getUserCollections)
 
 export default router;

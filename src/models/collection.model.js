@@ -34,11 +34,6 @@ const collectionSchema = new Schema(
             required: true
         },
         
-        todos: [{
-            type: Schema.Types.ObjectId,
-            ref: "Todo"
-        }],
-        
         isPrivate: {
             type: Boolean,
             default: false
