@@ -7,12 +7,14 @@ const todoSchema = new Schema (
             type: String,
             required: true,
             minLength: 5,
-            maxLength: 30
+            maxLength: 30,
+            trim: true
         },
         
         content: {
             type: String,
-            maxLength: 500
+            maxLength: 500,
+            trim: true
         },
         
         completed: {
@@ -44,7 +46,7 @@ const todoSchema = new Schema (
 
 todoSchema.index({ createdBy: 1 });
 todoSchema.index({ title: 1, createdBy: 1 }, {unique: true});
-todoSchema.index({ category: 1 });
+todoSchema.index({ parentCollection: 1, createdAt: 1 });
 todoSchema.plugin(mongooseAggregatePaginate);
 
 export const Todo = mongoose.model("Todo", todoSchema);
