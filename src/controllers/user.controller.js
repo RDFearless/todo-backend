@@ -161,7 +161,7 @@ const accessRefreshToken = asyncHandler( async (req, res) => {
     );
     
     try {
-        const user = await User.findById(decodedToken?._id);
+        const user = await User.findById(decodedToken?._id)
         if(!user) {
             throw new ApiError(401, "Invalid Refresh Token");
         }
@@ -176,6 +176,9 @@ const accessRefreshToken = asyncHandler( async (req, res) => {
             secure: true
         };
         
+        user.password = undefined
+        user.refreshToken = undefined
+        
         return res
         .status(200)
         .cookie("refreshToken", refreshToken, options)
@@ -183,7 +186,7 @@ const accessRefreshToken = asyncHandler( async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                {},
+                user,
                 "New token generated"
             )
         )
