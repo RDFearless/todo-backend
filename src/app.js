@@ -25,4 +25,8 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/collections", collectionRouter);
 app.use("/api/v1/todos", todoRouter);
 
+// global error handler
+import {globalErrorHandler} from "./middlewares/error.middleware.js";
+app.use(globalErrorHandler);
+
 export { app }
