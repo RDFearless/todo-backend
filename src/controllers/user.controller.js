@@ -245,7 +245,7 @@ const updateUserInfo = asyncHandler( async (req, res) => {
         updatedInfo.username = username;
     }
     if(email) {
-        validateFullname(email);
+        validateEmail(email);
         updatedInfo.email = email;
     }
     

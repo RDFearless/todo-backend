@@ -6,7 +6,7 @@ const todoSchema = new Schema (
         title: {
             type: String,
             required: true,
-            minLength: 5,
+            minLength: 2,
             maxLength: 30,
             trim: true
         },

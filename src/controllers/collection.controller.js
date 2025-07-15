@@ -2,6 +2,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { Collection } from "../models/collection.model.js"
 import { User } from "../models/user.model.js"
+import { Todo } from "../models/todo.model.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { isValidObjectId } from "mongoose"
 
@@ -140,11 +141,13 @@ const deleteCollection = asyncHandler( async (req, res) => {
         throw new ApiError(500, "Internal server error while deleting collection");
     }
     
-    await User.findByIdAndUpdate(
-        req.user._id,
-        { $pull: {collections: collectionId }},
-        { new: true }
-    );
+    // Delete all todos inside this collection
+    try {
+        await Todo.deleteMany({ parentCollection: collectionId });
+    } catch (error) {
+        console.error("Error deleting todos in collection:", error);
+        throw new ApiError(500, "Internal server error while deleting todos in collection");
+    }
     
     return res
     .status(200)
