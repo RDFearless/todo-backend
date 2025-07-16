@@ -10,6 +10,11 @@ import {
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 
+const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+}
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -98,12 +103,7 @@ const loginUser = asyncHandler( async (req, res) => {
     const {refreshToken, accessToken} = await generateAccessAndRefreshToken(user._id);
     
     const loggedUser = await User.findById(user._id).select("-password -refreshToken");
-    
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
-    
+     
     return res
     .status(200)
     .cookie("refreshToken", refreshToken, options)
@@ -126,11 +126,6 @@ const logoutUser = asyncHandler( async (req, res) => {
             { $unset: { refreshToken: 1 } },
             { new: true }
         );
-        
-        const options = {
-            httpOnly: true,
-            secure: true
-        }
         
         return res
         .status(200)
@@ -170,11 +165,6 @@ const accessRefreshToken = asyncHandler( async (req, res) => {
         }
         
         const {refreshToken, accessToken} = await generateAccessAndRefreshToken(user._id);
-            
-        const options = {
-            httpOnly: true,
-            secure: true
-        };
         
         user.password = undefined
         user.refreshToken = undefined
@@ -213,12 +203,7 @@ const changeCurrentPassword = asyncHandler( async (req, res) => {
     }
     
     user.password = newPassword;
-    await user.save({ validateBeforeSave: false }); 
-    
-    const options = {
-        httpOnly: true,
-        secure: true
-    }
+    await user.save({ validateBeforeSave: false });
     
     return res
     .status(200)
