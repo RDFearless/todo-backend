@@ -9,8 +9,8 @@ const corsOptions = {
     credentials: true
 }
 
-app.get("/", (_, res) => {
-    res.send("Hello, curl is working !!!");
+app.get("/api/health", (_, res) => {
+    res.json({ status: "ok" });
 });
 
 // config to be used accross whole backend
