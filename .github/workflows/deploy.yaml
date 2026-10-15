@@ -20,6 +20,6 @@ jobs:
           username: root
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd todo-backen/
+            cd todo-backend/
             git pull
             docker compose up -d --build
