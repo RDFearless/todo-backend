@@ -13,17 +13,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Prepare SSH key
-        run: |
-          printf '%s' "${{ secrets.SSH_KEY }}" | sed 's/\\n/\n/g' | tr -d '\r' > "${{ github.workspace }}/.deploy_key"
-          chmod 600 "${{ github.workspace }}/.deploy_key"
-
       - name: Deploy Via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
-          key_path: /github/workspace/.deploy_key
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd todo-backend/
             git pull
